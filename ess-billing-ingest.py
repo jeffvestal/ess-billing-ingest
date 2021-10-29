@@ -140,11 +140,9 @@ def pull_deployment_itemized(org_id, billing_api_key, deployment_itemized_index,
         payload = {}
 
         #build deployments and extra info
-        payload['deployment'] = {
-                'deployment_id' : deployment['deployment_id'],
-                'deployment_name' : deployment['deployment_name'],
-                'api' : itemized_endp
-                }
+        payload['deployment_id'] = deployment['deployment_id']
+        payload['deployment_name'] = deployment['deployment_name']
+        payload['api'] = itemized_endp
         payload['_index'] = deployment_itemized_index
         payload['@timestamp'] = now
 
@@ -242,7 +240,7 @@ if __name__ == '__main__':
     organization_delay = 60
     org_summary_index = 'ess.billing'
 
-    deployment_inventory_delay = 3600
+    deployment_inventory_delay = 60
     deployment_index = 'ess.billing.deployment'
 
     deployment_itemized_delay = 60
