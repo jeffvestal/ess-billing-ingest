@@ -137,23 +137,29 @@ def pull_deployment_itemized(org_id, billing_api_key, deployment_itemized_index,
         #TODO something else
     else:
         rj = response.json()
-        payload = {}
+        payload = []
 
-        #build deployments and extra info
-        payload['deployment_id'] = deployment['deployment_id']
-        payload['deployment_name'] = deployment['deployment_name']
-        payload['api'] = itemized_endp
-        payload['_index'] = deployment_itemized_index
-        payload['@timestamp'] = now
+        #Break apart the itemized items to make aggregating easier
+        common = {
+                'deployment_id' : deployment['deployment_id'],
+                'deployment_name' : deployment['deployment_name'],
+                'api' : itemized_endp,
+                '_index' : deployment_itemized_index,
+                '@timestamp' : now
+                }
 
-        # Rather than deal wiht nested docs, break out the DTS and Resource info by SKU
-        for key in rj:
-            if key in ('data_transfer_and_storage', 'resources'):
-                payload[key] = {}
-                for d in rj[key]:
-                    payload[key][d['sku']] = d
-            else:
-                payload[key] = rj[key]
+        # high level costs
+        rj['costs'].update(common)
+        rj['costs']['bill.type'] = 'costs-summary'
+        payload.append(rj['costs'])
+
+        # split out dts and resources line items and add cloud_provider field
+        for bt in ('data_transfer_and_storage', 'resources'):
+            for item in rj[bt]:
+                item['cloud.provider'] = item['sku'].split('.')[0]
+                item['bill.type'] = bt
+                item.update(common)
+                payload.append(item)
 
 
     logging.debug(payload)
@@ -215,13 +221,14 @@ def main(billing_api_key, es, organization_delay, org_summary_index, deployment_
             for d in deployments:
                 logging.info(f'calling pull_deployment_itemized after {deployment_itemized_elapsed} seconds')
                 itemized = pull_deployment_itemized(org_id, billing_api_key, deployment_itemized_index, d, now)
-                billing_payload.append(itemized)
+                billing_payload.extend(itemized)
             deployment_itemized_last_run = time()
 
 
         if billing_payload:
             logging.info('sending payload to bulk')
             helpers.bulk(es, billing_payload)
+            logging.info('Bulk indexing complete')
 
         # don't spin
         sleep(1)
