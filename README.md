@@ -18,6 +18,12 @@ Depending on the section, info can include:
 
 Billing data is sent to an elasticsearch cluster where it can be used for analysis, searching, alerting, dashboard, magic
 
+# Example Dashboards
+<img width="2448" alt="ESS Billing Account Overview" src="https://user-images.githubusercontent.com/53237856/139737781-a79251ca-8e20-41da-a1da-f41a4ef88338.png">
+
+<img width="2441" alt="ESS Billing Deployment Details" src="https://user-images.githubusercontent.com/53237856/139737796-bdf535a3-c5b2-4bb2-80f6-66e2ed80e658.png">
+
+
 # Requirements
 - python 3.6+
 - [elasticsearch python library](https://elasticsearch-py.readthedocs.io/)
