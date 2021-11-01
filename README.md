@@ -60,6 +60,25 @@ By default data is written out to 3 separate indices:
 #### Mapping
 Elasticsearch correctly auto-types each field. If a different type is required index templates can be set up ahead of time. 
 
+#### Runtime Field
+There is one runtime field added to the mapping to parse out the cloud region for the `ess.billing.deployment.itemized` documents of `bill.type:resources` 
+This can be added to the index mapping at any time. 
+```
+PUT ess.billing.deployment.itemized/_mapping
+{
+    "runtime": {
+    "cloudregion": {
+      "type": "keyword",
+      "script": """
+      if (doc["bill.type.keyword"].value == "resources") {
+        String cloudregion=grok('%{WORD:provider}\\.%{WORD:node_type}\\.%{WORD:nothing}\\.%{WORD:nothing}-%{DATA:cloudregion}_').extract(doc["sku.keyword"].value)?.cloudregion;
+        if (cloudregion != null) emit(cloudregion); 
+      }
+        """
+    }
+  }
+```
+
 #### ILM
 Currently ILM is not auto-configured, so it is up to the user to decide how they want to manage the lifecycle of the data
 
