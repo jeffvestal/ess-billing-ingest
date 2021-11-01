@@ -1,5 +1,8 @@
+## *This is a work in progress. Caution should be used when making financial or operational decisions off this data. Confirm all data directly from the Elastic Cloud Billing Dashboard in your account. This is not officially endorsed or supported by Elastic Co.*
+
 # ESS Billing Ingest
 Pulls Elastic Cloud Billing information from the [Billing API](https://www.elastic.co/guide/en/cloud/current/Billing_Costs_Analysis.html) then sends it to an elasticsearch cluster
+
 Author : Jeff Vestal - github.com/jeffvestal
 
 # Description
